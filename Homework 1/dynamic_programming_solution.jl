@@ -1,24 +1,32 @@
 function dynamic_knapsack(utilities, weights, b)
     N = length(utilities)
-    recursive_dynamic_knapsack(utilities, weights, b, zeros(N), 0)
-end
+    b = Int(b)
 
-function recursive_dynamic_knapsack(utilities, weights, b, x, total_utility)
-    best_util = total_utility
-    best_x = x
-    N = length(utilities)
-    for i = 1:N
-        if b - weights[i] < 0
-            continue
-        else
-            y = copy(x)
-            y[i] += 1
-            u, z = recursive_dynamic_knapsack(utilities, weights, b-weights[i], y, total_utility+utilities[i])
-            if u > best_util
-                best_util = u
-                best_x = z
+    objectives = zeros(b+1)
+    x = zeros(b+1, N)
+
+    for i = 2:b+1
+        objectives[i] = objectives[i-1]
+        x[i,:] = x[i-1,:]
+        available_size = i-1
+
+        for j = 1:N
+            # only check objects that can fit in the sack
+            if available_size >= weights[j]
+                # compute the utility if we add object j
+                current_utility = utilities[j] + objectives[i - weights[j]]
+
+                # update if utility is better
+                if current_utility > objectives[i]
+                    objectives[i] = current_utility
+                    y = copy(x[i-weights[j],:])
+                    y[j] += 1
+                    x[i,:] = y
+                end
+
             end
         end
     end
-    best_util, best_x
+
+    return objectives[end], x[end,:]
 end

@@ -5,7 +5,7 @@ function greedy_knapsack(utilities, weights, b)
     total_utility = 0
     x = zeros(N)
     
-    sorted_idx = sortperm(item_value)
+    sorted_idx = sortperm(item_value, rev=true)
     
     for i = sorted_idx
         while total_weight + weights[i] <= b

@@ -4,7 +4,7 @@ include("gurobi_solution.jl")
 include("greedy_algorithm.jl")
 include("dynamic_programming_solution.jl")
 
-DATA_PATH = "small.json"
+DATA_PATH = "medium.json"
 data = JSON.parsefile(DATA_PATH)
 
 # variables for easy access
