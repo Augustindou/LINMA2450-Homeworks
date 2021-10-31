@@ -24,5 +24,5 @@ function gurobi_knapsack(utilities, weights, b)
     optimize!(model)
     
     # returning results
-    objective_value(model), JuMP.value.(x)
+    return objective_value(model), JuMP.value.(x)
 end
