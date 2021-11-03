@@ -1,11 +1,11 @@
 function greedy_knapsack(utilities, weights, b)
     N = length(utilities)
-    item_value = [utilities[i]/weights[i] for i = 1:N]
+    ratios = [utilities[i]/weights[i] for i = 1:N]
     total_weight = 0
     total_utility = 0
     x = zeros(N)
     
-    sorted_idx = sortperm(item_value, rev=true)
+    sorted_idx = sortperm(ratios, rev=true)
     
     for i = sorted_idx
         y = floor((b - total_weight) / weights[i])

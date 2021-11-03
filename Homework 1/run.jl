@@ -37,27 +37,31 @@ end
 
 
 function time_analysis(data_paths)
-    gurobi = []
-    greedy = []
-    dp     = []
-    for data_path = data_paths
-        data = JSON.parsefile(data_path)
+    algorithms = [("Greedy", greedy_knapsack), ("DP", dynamic_knapsack), ("Gurobi Solver", gurobi_knapsack)]
 
-        # variables for easy access
-        utilities = data["utility"] # a_i
-        weights = data["weight"] # c_i
-        b = data["b"] # b     
+    results = Dict("Greedy"=>[], "DP"=>[], "Gurobi Solver"=>[])
 
-        # Compute results for each implementation
-        #t = @elapsed z, x = gurobi_knapsack(utilities, weights, b)
-        #gurobi = push!(gurobi, (t, z))
-        t = @elapsed z, x = greedy_knapsack(utilities, weights, b)
-        greedy = push!(greedy, (t, z))
-        t = @elapsed z, x = dynamic_knapsack(utilities, weights, b)
-        dp = push!(dp, (t, z))
+    for (name, algorithm) = algorithms
+        for data_path = data_paths
+            data = JSON.parsefile(data_path)
+    
+            # variables for easy access
+            utilities = data["utility"] # a_i
+            weights = data["weight"] # c_i
+            b = data["b"] # b
+
+            # launching the algorithm on the dataset
+            t = @elapsed z, x = algorithm(utilities, weights, b)
+
+            # Saving the results
+            results[name] = push!(results[name], (t, z)) 
+            
+            # Displaying the results
+            println("Results for "*name*" on dataset "*data_path*" : \n z = "*string(Int(z))*"\n Computed in "*string(t)*" seconds\n")
+        end
     end
 
-    return gurobi, greedy, dp
+    return results
 end
 
 
