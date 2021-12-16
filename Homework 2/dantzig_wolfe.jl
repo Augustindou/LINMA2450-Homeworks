@@ -1,4 +1,7 @@
-using sub_problems: createSubProblem
+using JuMP
+
+include("sub_problems.jl")
+include("restricted_master_problem.jl")
 
 
 function dantzig_wolfe(generators, periods, generators_data, demand)
@@ -13,20 +16,17 @@ function dantzig_wolfe(generators, periods, generators_data, demand)
     # todo liste de P et z
     
     # choose initial d0
-    d = # TODO
+    costs = 20*ones(T) # TODO
+    d = Dict(g => 0 for g in generators)
 
     while true
         generator_count = 0
 
         for g in generators
             # find P, U, V, W that solves problem 13 with d^k with objective value z^k
-            subproblem = createSubProblem(generators_data[g], periods, d[G:G+T])
-            optimize!(subproblem)
+            Zg, Pg = createSubProblem(generators_data[g], periods, costs)
 
-            Zg = objective_value(subproblem)
-            Pg = JuMP.value.(prod)
-            
-            if Zg == d
+            if Zg == d[g]
                 generator_count = generator_count+1
             else
                 # add (P,U,V,W) to B
@@ -41,48 +41,8 @@ function dantzig_wolfe(generators, periods, generators_data, demand)
         end
 
         # find d^k+1 and l^k+1 that solve problem 11
-        A = get_A(P, G, T, generators, N_TOT)
-        h = get_h(demand, G, T)
-        c = get_c(Z, G, generators, N_TOT)
-        
-        d = # TODO
-    end
-end
-
-
-function get_A(P, G, T, generators, N_TOT)
-    A = zeros(G + T, N_TOT)
-    pos = 1
-    for g in 1:G
-        N = length(P[generators[g]])
-        A[g, pos:pos+N] .= 1
-        
-        for i in 1:N
-            A[G+1:G+T, pos+i-1] = P[generators[g]][i]
-        end
-
-        pos += N
-    end
-    
-    return A
-end
-
-function get_h(D, G, T)
-    h = ones(G+T)
-    h[G+1:G+T] = D
-
-    return h
-end
-
-function get_c(Z, G, generators, N_TOT)
-    c = zeros(N_TOT)
-    pos = 1
-    
-    for g in 1:G
-        N = length(Z[generators[g]])
-        c[pos:pos+N] = Z[generators[g]]
-        pos += N
+        costs, d = createRMP(P, Z, demand, generators, T, G)
     end
 
-    return c
+    return "bite"
 end

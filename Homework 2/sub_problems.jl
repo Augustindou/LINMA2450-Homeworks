@@ -143,5 +143,11 @@ function createSubProblem(generators_data, periods, prices)
     commit[t] == sum(pwl_prod[l, t] for l in pwl_points)
     )
 
-    return sub_problem
+    optimize!(sub_problem)
+
+    Zg = objective_value(sub_problem)
+    Pg = JuMP.value.(prod)
+
+
+    return Zg, Pg
 end
