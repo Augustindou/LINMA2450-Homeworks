@@ -17,31 +17,46 @@ function dantzig_wolfe(generators, periods, generators_data, demand)
     
     # choose initial d0
     costs = 20*ones(T) # TODO
-    d = Dict(g => 0 for g in generators)
+    d = Dict(g => Inf for g in generators)
+
+    UB = Inf 
+    LB = -Inf
+
+    generator_count = 0
+
+    k = 0
 
     while true
-        generator_count = 0
+        k += 1
+
+        print("k = ")
+        println(k)
 
         for g in generators
             # find P, U, V, W that solves problem 13 with d^k with objective value z^k
             Zg, Pg = createSubProblem(generators_data[g], periods, costs)
 
-            if Zg == d[g]
-                generator_count = generator_count+1
-            else
+            if Zg == d[g] && k > 1
+                generator_count += 1
+            else 
                 # add (P,U,V,W) to B
                 N_TOT += 1
                 push!(Z[g], Zg)
                 push!(P[g], Pg)
             end
+            
         end
 
         if generator_count == G
             break
         end
 
+        print("generator count = ")
+        println(generator_count)
+
         # find d^k+1 and l^k+1 that solve problem 11
         costs, d = createRMP(P, Z, demand, generators, T, G)
+
     end
 
     return "bite"
