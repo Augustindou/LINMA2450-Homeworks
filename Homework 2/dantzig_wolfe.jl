@@ -59,5 +59,5 @@ function dantzig_wolfe(generators, periods, generators_data, demand)
 
     end
 
-    return "bite"
+    return "Generateur 36"
 end
