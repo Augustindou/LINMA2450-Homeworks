@@ -39,6 +39,7 @@ function createRMP(P, Z, demand, generators, T, G)
     # print("--------------------------------------\n")
     costs = JuMP.dual.(costs)
     d     = JuMP.dual.(lambda_dual)
+    z     = JuMP.objective_value(rmp)
 
-    return costs, d 
+    return costs, d, z
 end
